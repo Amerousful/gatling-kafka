@@ -1,4 +1,4 @@
-# Gatling Kafka Plugin
+# Gatling Kafka Plugin [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.amerousful/gatling-kafka/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.amerousful/gatling-kafka/)
 
 ## Install
 
@@ -120,7 +120,7 @@ object CustomMatcher extends KafkaMatcher {
 
 ```
 \
-Chain for build request:
+### Chain for build a request:
 ```text
 send -> 
             topic() -> 
@@ -134,3 +134,21 @@ requestReply ->
                             key() / headers() / check()
 ```
 
+### Reply consumer name:
+1) Static name: `.replyConsumerName("gatling-test-consumer")` 
+2) If you don't define a static name it will generate by pattern `gatling-test-${java.util.UUID.randomUUID()}`
+
+### Logs:
+Add to your `logback.xml`: 
+```xml
+<logger name="io.github.amerousful.kafka" level="ALL"/>
+```
+
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)

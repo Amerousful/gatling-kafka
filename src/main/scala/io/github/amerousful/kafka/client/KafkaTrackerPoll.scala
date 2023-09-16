@@ -63,7 +63,7 @@ class KafkaTrackerPoll(
     }
 
     val consProps = updateProperties.map(i => s"${i._1}: ${i._2}").mkString("\n")
-    logger.debug(s"Consumer properties:\n$consProps")
+    logger.debug(s"Consumer properties:\n$consProps\n")
 
     updateProperties
   }
