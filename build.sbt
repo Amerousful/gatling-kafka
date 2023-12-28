@@ -1,11 +1,11 @@
 name := "gatling-kafka"
 
-version := "1.0"
+version := "1.1"
 
 scalaVersion := "2.13.8"
 
 libraryDependencies ++= Seq(
-  "io.gatling" % "gatling-core" % "3.9.5" % "provided",
+  "io.gatling" % "gatling-core" % "3.10.3" % "provided",
 
   "com.typesafe.akka" %% "akka-stream-kafka" % "4.0.2",
   "com.typesafe.akka" %% "akka-protobuf-v3" % "2.6.20",
