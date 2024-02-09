@@ -1,0 +1,7 @@
+Changelog 2.0 (09-02-2024)
+----------------------------
+* Implement support for both Java and Kotlin
+* Downgrade Gatling to version '3.9.5'. The backward compatibility is broken for ActionBuilder in version 3.10.x
+* Add support for regular expression (regex) check
+* Add support for header check
+* Fix initialization issue with tracker poll consumer for Send request

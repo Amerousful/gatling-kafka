@@ -7,7 +7,7 @@ import org.apache.kafka.clients.producer.ProducerRecord
 
 import scala.concurrent.duration.DurationInt
 
-object Example {
+object KafkaScalaExample {
 
   val brokers = List(
     KafkaBroker("kafka.us-east-1.amazonaws.com", 9096),
@@ -57,6 +57,15 @@ object Example {
     .payload("""{ "m": "#{payload}" }""")
     .replyTopic("output_topic")
     .key("#{id} #{key}")
-    .check(jsonPath("$.m").is("#{payload}_1"))
+    .header("headerKey1", "headerValue1")
+    .check(
+      jsonPath("$.m").is("#{payload}_1"),
+      header("headerKey1").is("headerValue1")
+    )
+    .check(regex(""))
+    .check(simpleCheck {
+      // Custom check allows you to verify any entity of the record according to your needs.
+      record => true
+    })
 
 }

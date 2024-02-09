@@ -30,7 +30,7 @@ class KafkaTrackerPoll(
   private val rebalancingLatch: CountDownLatch = new CountDownLatch(1)
 
   // Disable logs for Actor
-  val disableLogsConfig: Config = {
+  private val disableLogsConfig: Config = {
     val configString =
       """
         | akka {
@@ -41,8 +41,8 @@ class KafkaTrackerPoll(
     val config = ConfigFactory.parseString(configString)
     ConfigFactory.load(config)
   }
-  implicit val systemAkkaConsumer: ActorSystem = ActorSystem("KafkaAkkaConsumer", disableLogsConfig)
-  implicit val materializer: Materializer = Materializer.matFromSystem(systemAkkaConsumer)
+  implicit lazy val systemAkkaConsumer: ActorSystem = ActorSystem("KafkaAkkaConsumer", disableLogsConfig)
+  implicit lazy val materializer: Materializer = Materializer.matFromSystem(systemAkkaConsumer)
 
   def close(): Unit = trackers.values().forEach {
     case TrackerAndController(_, consumerControl) => consumerControl.shutdown()
