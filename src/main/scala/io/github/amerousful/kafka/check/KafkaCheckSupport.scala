@@ -6,16 +6,18 @@ import io.gatling.core.check.Check.PreparedCache
 import io.gatling.core.check.bytes.BodyBytesCheckType
 import io.gatling.core.check.jmespath.JmesPathCheckType
 import io.gatling.core.check.jsonpath.JsonPathCheckType
+import io.gatling.core.check.regex.RegexCheckType
 import io.gatling.core.check.string.BodyStringCheckType
 import io.gatling.core.check.substring.SubstringCheckType
 import io.gatling.core.check.xpath.XPathCheckType
 import io.gatling.core.check.{Check, CheckBuilder, CheckMaterializer, CheckResult, TypedCheckIfMaker, UntypedCheckIfMaker}
 import io.gatling.core.config.GatlingConfiguration
 import io.gatling.core.json.JsonParsers
-import io.gatling.core.session.Session
+import io.gatling.core.session.{Expression, Session}
+import io.github.amerousful.kafka._
+import io.github.amerousful.kafka.check.header.{KafkaHeaderCheckBuilder, KafkaHeaderCheckMaterializer, KafkaHeaderCheckType}
 import net.sf.saxon.s9api.XdmNode
 import org.apache.kafka.clients.consumer.ConsumerRecord
-import io.github.amerousful.kafka._
 
 import scala.annotation.implicitNotFound
 
@@ -48,23 +50,33 @@ trait KafkaCheckSupport {
   (implicit materializer: CheckMaterializer[T, KafkaCheck, KafkaResponseMessage, P]): KafkaCheck =
     find.find.exists
 
+  // body string
   implicit def kafkaBodyStringCheckMaterializer
   (implicit configuration: GatlingConfiguration): CheckMaterializer[BodyStringCheckType, KafkaCheck, KafkaResponseMessage, String] =
     KafkaCheckMaterializer.bodyString()
 
+  // body length
   implicit def kafkaBodyLengthCheckMaterializer
   (implicit configuration: GatlingConfiguration): CheckMaterializer[BodyBytesCheckType, KafkaCheck, KafkaResponseMessage, Int] =
     KafkaCheckMaterializer.bodyLength()
 
+  // body bytes
+  implicit def kafkaBodyBytesCheckMaterializer
+  (implicit configuration: GatlingConfiguration): CheckMaterializer[BodyBytesCheckType, KafkaCheck, KafkaResponseMessage, Array[Byte]] =
+    KafkaCheckMaterializer.bodyBytes(configuration.core.charset)
+
+  // substring
   implicit def kafkaSubstringCheckMaterializer
   (implicit configuration: GatlingConfiguration): CheckMaterializer[SubstringCheckType, KafkaCheck, KafkaResponseMessage, String] =
     KafkaCheckMaterializer.substring()
 
+  // json path
   implicit def kafkaJsonPathCheckMaterializer
   (implicit jsonParsers: JsonParsers, configuration: GatlingConfiguration):
   CheckMaterializer[JsonPathCheckType, KafkaCheck, KafkaResponseMessage, JsonNode] =
     KafkaCheckMaterializer.jsonPath(jsonParsers)
 
+  // jmes path
   implicit def kafkaJmesPathCheckMaterializer
   (implicit jsonParsers: JsonParsers, configuration: GatlingConfiguration):
   CheckMaterializer[JmesPathCheckType, KafkaCheck, KafkaResponseMessage, JsonNode] =
@@ -73,7 +85,14 @@ trait KafkaCheckSupport {
   implicit val kafkaXPathMaterializer: CheckMaterializer[XPathCheckType, KafkaCheck, KafkaResponseMessage, XdmNode] =
     KafkaCheckMaterializer.Xpath
 
+  implicit val kafkaRegexMaterializer: CheckMaterializer[RegexCheckType, KafkaCheck, KafkaResponseMessage, String] =
+    KafkaCheckMaterializer.Regex
+
   implicit val kafkaUntypedCheckIfMaker: UntypedCheckIfMaker[KafkaCheck] = _.checkIf(_)
 
   implicit val kafkaTypedCheckIfMaker: TypedCheckIfMaker[KafkaResponseMessage, KafkaCheck] = _.checkIf(_)
+
+  def header(headerName: Expression[CharSequence]): CheckBuilder.MultipleFind[KafkaHeaderCheckType, KafkaResponseMessage, String] = new KafkaHeaderCheckBuilder(headerName)
+  implicit val kafkaHeaderCheckMaterializer: CheckMaterializer[KafkaHeaderCheckType, KafkaCheck, KafkaResponseMessage, KafkaResponseMessage] = KafkaHeaderCheckMaterializer.Instance
+
 }

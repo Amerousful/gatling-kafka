@@ -11,7 +11,7 @@ Add to your `pom.xml`
 <dependency>
     <groupId>io.github.amerousful</groupId>
     <artifactId>gatling-kafka</artifactId>
-    <version>1.1</version>
+    <version>2.0</version>
 </dependency>
 ```
 
@@ -20,7 +20,7 @@ Add to your `pom.xml`
 Add to your `build.sbt`
 
 ```scala
-libraryDependencies += "io.github.amerousful" % "gatling-kafka" % "1.1"
+libraryDependencies += "io.github.amerousful" % "gatling-kafka" % "2.0"
 ```
 
 Import:
@@ -70,6 +70,26 @@ Request and reply:
   .key("#{id} #{key}")
   .check(jsonPath("$.m").is("#{payload}_1"))
 ```
+***
+Scenario:
+```scala
+scenario("Kafka Scenario")
+  .exec(kafkaFireAndForget)
+```
+
+Inject:
+
+```scala
+setUp(
+  scn.inject(
+    constantUsersPerSec(2) during(10 seconds)
+  ).protocols(kafkaProtocol)
+)
+```
+
+
+### [Java example](src/test/scala/KafkaJavaExample.java)
+### [Kotlin example](src/test/scala/KafkaKotlinExample.kt)
 
 ***
 
@@ -119,7 +139,7 @@ object CustomMatcher extends KafkaMatcher {
 .messageMatcher(CustomMatcher)
 
 ```
-\
+
 ### Chain for build a request:
 ```text
 send -> 

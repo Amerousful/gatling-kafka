@@ -5,13 +5,14 @@ import io.gatling.commons.validation._
 import io.gatling.core.check.bytes.BodyBytesCheckType
 import io.gatling.core.check.jmespath.JmesPathCheckType
 import io.gatling.core.check.jsonpath.JsonPathCheckType
+import io.gatling.core.check.regex.RegexCheckType
 import io.gatling.core.check.string.BodyStringCheckType
 import io.gatling.core.check.substring.SubstringCheckType
 import io.gatling.core.check.xpath.{XPathCheckType, XmlParsers}
 import io.gatling.core.check.{CheckMaterializer, Preparer}
 import io.gatling.core.json.JsonParsers
-import net.sf.saxon.s9api.XdmNode
 import io.github.amerousful.kafka._
+import net.sf.saxon.s9api.XdmNode
 
 import java.nio.charset.Charset
 
@@ -37,7 +38,6 @@ object KafkaCheckMaterializer {
       safely(JsonPreparerErrorMapper) {
         jsonParsers.safeParse(message.value())
       }
-
 
   def bodyString(): CheckMaterializer[BodyStringCheckType, KafkaCheck, KafkaResponseMessage, String] =
     new KafkaCheckMaterializer[BodyStringCheckType, String](stringBodyPreparer())
@@ -69,4 +69,6 @@ object KafkaCheckMaterializer {
     new KafkaCheckMaterializer(preparer)
   }
 
+  val Regex: CheckMaterializer[RegexCheckType, KafkaCheck, KafkaResponseMessage, String] =
+    new KafkaCheckMaterializer(stringBodyPreparer())
 }
