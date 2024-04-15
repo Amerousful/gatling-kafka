@@ -5,6 +5,5 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 
 package object kafka {
   type KafkaCheck = Check[KafkaResponseMessage]
-
-  type KafkaResponseMessage = ConsumerRecord[String, String]
+  type KafkaResponseMessage = ConsumerRecord[String, _]
 }

@@ -115,6 +115,11 @@ public final class KafkaProtocolBuilder implements ProtocolBuilder {
         return new KafkaProtocolBuilder(wrapped.replyConsumerName(name));
     }
 
+    @NonNull
+    public KafkaProtocolBuilder schemaUrl(@NonNull String url) {
+        return new KafkaProtocolBuilder(wrapped.schemaUrl(url));
+    }
+
     @Override
     public Protocol protocol() {
         return wrapped.build();

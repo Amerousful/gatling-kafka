@@ -7,7 +7,7 @@ import io.github.amerousful.kafka._
 
 class KafkaTracker(actor: ActorRef) {
   def track(
-             matchId: String,
+             matchId: Any,
              sent: Long,
              replyTimeoutInMs: Long,
              checks: List[KafkaCheck],

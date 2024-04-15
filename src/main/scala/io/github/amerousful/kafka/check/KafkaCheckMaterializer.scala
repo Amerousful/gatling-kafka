@@ -23,20 +23,21 @@ class KafkaCheckMaterializer[T, P]
 object KafkaCheckMaterializer {
 
   private def stringBodyPreparer(): Preparer[KafkaResponseMessage, String] =
-    message => message.value().success
+    message => message.value().toString.success
 
-  private def bodyLengthPreparer(): Preparer[KafkaResponseMessage, Int] =
-    message => message.value().length.success
+  private def bodyLengthPreparer(): Preparer[KafkaResponseMessage, Int] = {
+    message => message.value().toString.length.success
+  }
 
   private def bodyBytesPreparer(charset: Charset): Preparer[KafkaResponseMessage, Array[Byte]] =
-    message => message.value().getBytes(charset).success
+    message => message.value().toString.getBytes(charset).success
 
   private val JsonPreparerErrorMapper: String => String = "Could not parse response into a JSON: " + _
 
   private def jsonPreparer(jsonParsers: JsonParsers): Preparer[KafkaResponseMessage, JsonNode] =
     message =>
       safely(JsonPreparerErrorMapper) {
-        jsonParsers.safeParse(message.value())
+        jsonParsers.safeParse(message.value().toString)
       }
 
   def bodyString(): CheckMaterializer[BodyStringCheckType, KafkaCheck, KafkaResponseMessage, String] =
@@ -63,7 +64,7 @@ object KafkaCheckMaterializer {
     val preparer: Preparer[KafkaResponseMessage, XdmNode] =
       message =>
         safely(errorMapper) {
-          XmlParsers.parse(message.value()).success
+          XmlParsers.parse(message.value().toString).success
         }
 
     new KafkaCheckMaterializer(preparer)

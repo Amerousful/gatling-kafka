@@ -18,13 +18,13 @@ public class KafkaJavaExample {
             new KafkaMessageMatcher() {
                 @NonNull
                 @Override
-                public String requestMatchId(@NonNull ProducerRecord<String, String> msg) {
+                public String requestMatchId(@NonNull ProducerRecord<String, ?> msg) {
                     return msg.key();
                 }
 
                 @NonNull
                 @Override
-                public String responseMatchId(@NonNull ConsumerRecord<String, String> msg) {
+                public String responseMatchId(@NonNull ConsumerRecord<String, ?> msg) {
                     return msg.key();
                 }
             };
@@ -48,7 +48,7 @@ public class KafkaJavaExample {
             .replyConsumerName("gatling-test-consumer");
 
     //#simple
-    public boolean checkRecordValue(ConsumerRecord<String, String> record) {
+    public boolean checkRecordValue(ConsumerRecord<String, ?> record) {
         return record.value().equals("myValue");
     }
 
@@ -77,6 +77,14 @@ public class KafkaJavaExample {
                                     .then(jsonPath("$").is("hello"))
                                     .check(header("header1").in("value1"))
                                     .check(simpleCheck(this::checkRecordValue))
+                    )
+                    .exec(
+                            kafka("Kafka only consume")
+                                    .onlyConsume()
+                                    .readTopic("")
+                                    .payloadForTracking("")
+                                    .keyForTracking("")
+                                    .startTime(session -> 100000000L)
                     );
 
 }

@@ -1,3 +1,8 @@
+Changelog 3.0
+----------------------------
+* Protobuf support
+* Only consume
+
 Changelog 2.0 (09-02-2024)
 ----------------------------
 * Implement support for both Java and Kotlin

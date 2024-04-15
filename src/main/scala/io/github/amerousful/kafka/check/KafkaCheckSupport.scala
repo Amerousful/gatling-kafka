@@ -18,13 +18,15 @@ import io.github.amerousful.kafka._
 import io.github.amerousful.kafka.check.header.{KafkaHeaderCheckBuilder, KafkaHeaderCheckMaterializer, KafkaHeaderCheckType}
 import net.sf.saxon.s9api.XdmNode
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import io.github.amerousful.kafka.check.protobuf.{KafkaProtobufCheckBuilder, KafkaProtobufCheckMaterializer, KafkaProtobufCheckType}
+import scalapb.GeneratedMessage
 
 import scala.annotation.implicitNotFound
 
 trait KafkaCheckSupport {
 
   def simpleCheck(f: KafkaResponseMessage => Boolean): KafkaCheck =
-    Check.Simple((response: ConsumerRecord[String, String], _: Session, _: PreparedCache) => {
+    Check.Simple((response: ConsumerRecord[String, _], _: Session, _: PreparedCache) => {
       if (f(response)) {
         CheckResult.NoopCheckResultSuccess
       } else {
@@ -94,5 +96,8 @@ trait KafkaCheckSupport {
 
   def header(headerName: Expression[CharSequence]): CheckBuilder.MultipleFind[KafkaHeaderCheckType, KafkaResponseMessage, String] = new KafkaHeaderCheckBuilder(headerName)
   implicit val kafkaHeaderCheckMaterializer: CheckMaterializer[KafkaHeaderCheckType, KafkaCheck, KafkaResponseMessage, KafkaResponseMessage] = KafkaHeaderCheckMaterializer.Instance
+
+  def protobufResponse[ProtoClass <: GeneratedMessage, ExtractedType](extractFunction: ProtoClass => ExtractedType): CheckBuilder.Find[KafkaProtobufCheckType, KafkaResponseMessage, ExtractedType] = new KafkaProtobufCheckBuilder(extractFunction)
+  implicit val kafkaProtobufCheckMaterializer: CheckMaterializer[KafkaProtobufCheckType, KafkaCheck, KafkaResponseMessage, KafkaResponseMessage] = KafkaProtobufCheckMaterializer.Instance
 
 }

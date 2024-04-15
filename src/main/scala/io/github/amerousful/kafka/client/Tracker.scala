@@ -15,7 +15,7 @@ import scala.concurrent.duration._
 
 
 final case class MessageSent(
-                              matchId: String,
+                              matchId: Any,
                               sent: Long,
                               replyTimeoutInMs: Long,
                               checks: List[KafkaCheck],
@@ -25,7 +25,7 @@ final case class MessageSent(
                             )
 
 final case class MessageReceived(
-                                  matchId: String,
+                                  matchId: Any,
                                   received: Long,
                                   message: KafkaResponseMessage
                                 )
@@ -38,7 +38,7 @@ object Tracker {
 }
 
 class Tracker(statsEngine: StatsEngine, clock: Clock, replyTimeoutScanPeriod: FiniteDuration) extends Actor with Timers {
-  private val sentMessages = mutable.HashMap.empty[String, MessageSent]
+  private val sentMessages = mutable.HashMap.empty[Any, MessageSent]
   private val timedOutMessages = mutable.ArrayBuffer.empty[MessageSent]
   private var periodicTimeoutScanTriggered = false
 

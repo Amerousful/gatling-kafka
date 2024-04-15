@@ -9,8 +9,8 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 public interface KafkaMessageMatcher {
 
   @NonNull
-  String requestMatchId(@NonNull ProducerRecord<String, String> msg);
+  String requestMatchId(@NonNull ProducerRecord<String, ?> msg);
 
   @NonNull
-  String responseMatchId(@NonNull ConsumerRecord<String, String> msg);
+  String responseMatchId(@NonNull ConsumerRecord<String, ?> msg);
 }

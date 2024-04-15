@@ -50,7 +50,6 @@ final case class KafkaProtocolBuilder(kafkaProtocol: KafkaProtocol) {
       case SaslMechanism.scram_sha_256 => "scram.ScramLoginModule"
       case SaslMechanism.scram_sha_512 => "scram.ScramLoginModule"
     }
-    saslMechanism.toString
     addConsumerAndProducerProperty("security.protocol", protocol)
       .addConsumerAndProducerProperty("sasl.mechanism", saslMechanism.toString)
       .addConsumerAndProducerProperty("sasl.jaas.config",
@@ -61,7 +60,7 @@ final case class KafkaProtocolBuilder(kafkaProtocol: KafkaProtocol) {
     this.modify(_.kafkaProtocol.producerProperties)(_ + (key -> value))
   }
 
-  def addConsumerProperty(key: String, value: String): KafkaProtocolBuilder = {
+  def addConsumerProperty(key: String, value: AnyRef): KafkaProtocolBuilder = {
     this.modify(_.kafkaProtocol.consumerProperties)(_ + (key -> value))
   }
 
@@ -79,6 +78,8 @@ final case class KafkaProtocolBuilder(kafkaProtocol: KafkaProtocol) {
   def replyTimeout(timeout: FiniteDuration): KafkaProtocolBuilder = this.modify(_.kafkaProtocol.replyTimeout).setTo(Some(timeout))
 
   def replyConsumerName(name: String): KafkaProtocolBuilder = addConsumerProperty(GROUP_ID_CONFIG, name)
+
+  def schemaUrl(url: String): KafkaProtocolBuilder = addConsumerAndProducerProperty("schema.registry.url", url)
 
   def build: KafkaProtocol = kafkaProtocol
 }

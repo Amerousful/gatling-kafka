@@ -16,8 +16,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static io.gatling.javaapi.core.internal.Converters.toScalaMap;
-import static io.gatling.javaapi.core.internal.Expressions.javaFunctionToExpression;
-import static io.gatling.javaapi.core.internal.Expressions.toStringExpression;
+import static io.gatling.javaapi.core.internal.Expressions.*;
 
 
 public final class RequestReplyActionBuilder implements ActionBuilder {
@@ -55,11 +54,11 @@ public final class RequestReplyActionBuilder implements ActionBuilder {
 
     @NonNull
     public RequestReplyActionBuilder.ReplyTopic payload(@NonNull String payload) {
-      return new RequestReplyActionBuilder.ReplyTopic(wrapped.payload(toStringExpression(payload)));
+      return new RequestReplyActionBuilder.ReplyTopic(wrapped.payload(toAnyExpression(payload)));
     }
 
     @NonNull
-    public RequestReplyActionBuilder.ReplyTopic payload(@NonNull Function<Session, String> payload) {
+    public RequestReplyActionBuilder.ReplyTopic payload(@NonNull Function<Session, Object> payload) {
       return new RequestReplyActionBuilder.ReplyTopic(wrapped.payload(javaFunctionToExpression(payload)));
     }
 
@@ -145,7 +144,7 @@ public final class RequestReplyActionBuilder implements ActionBuilder {
 
   @NonNull
   public RequestReplyActionBuilder.TypedCondition checkIf(
-          @NonNull BiFunction<ConsumerRecord<String, String>, Session, Boolean> condition) {
+          @NonNull BiFunction<ConsumerRecord<String, ?>, Session, Boolean> condition) {
     return new RequestReplyActionBuilder.TypedCondition(
             ScalaKafkaRequestReplyActionBuilderConditions.typed(wrapped, condition));
   }

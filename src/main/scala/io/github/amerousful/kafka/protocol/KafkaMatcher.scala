@@ -4,16 +4,16 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.ProducerRecord
 
 trait KafkaMatcher {
-  def requestMatchId(msg: ProducerRecord[String, String]): String
-  def responseMatchId(msg: ConsumerRecord[String, String]): String
+  def requestMatchId(msg: ProducerRecord[String, _]): Any
+  def responseMatchId(msg: ConsumerRecord[String, _]): Any
 }
 
 object KafkaKeyMatcher extends KafkaMatcher {
-  override def requestMatchId(msg: ProducerRecord[String, String]): String = msg.key()
-  override def responseMatchId(msg: ConsumerRecord[String, String]): String = msg.key()
+  override def requestMatchId(msg: ProducerRecord[String, _]) = msg.key()
+  override def responseMatchId(msg: ConsumerRecord[String, _]) = msg.key()
 }
 
 object KafkaValueMatcher extends KafkaMatcher {
-  override def requestMatchId(msg: ProducerRecord[String, String]): String = msg.value()
-  override def responseMatchId(msg: ConsumerRecord[String, String]): String = msg.value()
+  override def requestMatchId(msg: ProducerRecord[String, _]) = msg.value()
+  override def responseMatchId(msg: ConsumerRecord[String, _]) = msg.value()
 }
