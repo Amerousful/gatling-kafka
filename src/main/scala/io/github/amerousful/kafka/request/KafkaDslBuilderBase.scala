@@ -5,9 +5,9 @@ import io.gatling.commons.validation.Validation
 import io.gatling.core.action.builder.ActionBuilder
 import io.gatling.core.session.el.El
 import io.gatling.core.session.{Expression, Session}
+import io.github.amerousful.kafka.Predef.ProtoBufScalaPB
 import io.github.amerousful.kafka.action.{OnlyConsumeBuilder, RequestReplyBuilder, SendBuilder}
 import io.github.amerousful.kafka.client.SerdeScalaPB
-import io.github.amerousful.kafka.client.SerdeScalaPB.ProtoBufScalaPB
 import io.github.amerousful.kafka.{KafkaCheck, KafkaResponseMessage}
 import scalapb.GeneratedMessage
 
