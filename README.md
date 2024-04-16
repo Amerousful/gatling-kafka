@@ -135,7 +135,7 @@ Another aspect to consider is the potential usefulness of tracking when a messag
 -- Consume a message from Kafka
 ```
 
-If do not pass a `startTime` it takes current time. 
+If startTime is not passed, it defaults to the current time. 
 
 ***
 In a case with request-reply you have to define in a **protocol** waiting time for the reply:
