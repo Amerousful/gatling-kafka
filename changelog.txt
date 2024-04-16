@@ -1,4 +1,4 @@
-Changelog 3.0
+Changelog 3.0 (16-04-2024)
 ----------------------------
 * Protobuf support
 * Only consume
