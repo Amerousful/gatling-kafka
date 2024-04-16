@@ -30,7 +30,7 @@ object KafkaProtocol extends StrictLogging {
           logger.debug(s"Producer properties:\n$prodProps\n")
         }
 
-        val producer = new KafkaProducer[String, String](producerProperties)
+        val producer = new KafkaProducer[String, Any](producerProperties)
         val trackerPoller = new KafkaTrackerPoll(
           consumerProperties,
           coreComponents.actorSystem,

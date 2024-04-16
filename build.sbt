@@ -1,10 +1,12 @@
 name := "gatling-kafka"
 
-version := "2.0"
+version := "3.0"
 
 scalaVersion := "2.13.12"
 
 val gatlingVersion = "3.9.5"
+
+resolvers += "confluent" at "https://packages.confluent.io/maven/"
 
 libraryDependencies ++= Seq(
   "io.gatling" % "gatling-core" % gatlingVersion % "provided",
@@ -15,6 +17,9 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-protobuf-v3" % "2.6.20",
   "com.typesafe.akka" %% "akka-stream" % "2.6.20",
   "com.typesafe.akka" %% "akka-slf4j" % "2.6.20",
+
+  "com.thesamet.scalapb" % "scalapb-runtime_2.13" % "0.11.15",
+  "io.confluent" % "kafka-protobuf-serializer" % "7.6.0" % "provided",
 )
 
 scalacOptions ++= Seq(

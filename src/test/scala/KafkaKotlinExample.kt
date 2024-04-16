@@ -12,11 +12,11 @@ import java.util.*
 class KafkaKotlinExample {
 
     private val customMatcher: KafkaMessageMatcher = object : KafkaMessageMatcher {
-        override fun requestMatchId(msg: ProducerRecord<String, String>): String {
+        override fun requestMatchId(msg: ProducerRecord<String, *>): String {
             return msg.key()
         }
 
-        override fun responseMatchId(msg: ConsumerRecord<String, String>): String {
+        override fun responseMatchId(msg: ConsumerRecord<String, *>): String {
             return msg.key()
         }
     }
@@ -40,7 +40,7 @@ class KafkaKotlinExample {
             .replyConsumerName("gatling-test-consumer")
 
     //#simple
-    fun checkRecordValue(record: ConsumerRecord<String?, String>): Boolean {
+    fun checkRecordValue(record: ConsumerRecord<String?, *>): Boolean {
         return record.value() == "myValue"
     }
 
@@ -64,9 +64,9 @@ class KafkaKotlinExample {
                             .check(CoreDsl.jsonPath("$.m").`is`("#{payload}_1"))
                             .checkIf("#{bool}")
                             .then(CoreDsl.jsonPath("$..foo"))
-                            .checkIf { message: ConsumerRecord<String?, String?>?, session: Session? -> true }
+                            .checkIf { message: ConsumerRecord<String?, *>?, session: Session? -> true }
                             .then(CoreDsl.jsonPath("$").`is`("hello"))
                             .check(KafkaDsl.header("header1").`in`("value1"))
-                            .check(KafkaDsl.simpleCheck { record: ConsumerRecord<String?, String> -> this.checkRecordValue(record) })
+                            .check(KafkaDsl.simpleCheck { record: ConsumerRecord<String?, *> -> this.checkRecordValue(record) })
             )
 }

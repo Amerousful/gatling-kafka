@@ -23,7 +23,7 @@ class Around(before: () => Unit, after: () => Unit) {
 abstract class KafkaAction(
                             attributes: KafkaAttributes,
                             protocol: KafkaProtocol,
-                            producer: KafkaProducer[String, String],
+                            producer: KafkaProducer[String, Any],
                             kafkaTrackerPoll: KafkaTrackerPoll
                           ) extends RequestAction with KafkaLogging with NameGen {
 
@@ -39,7 +39,8 @@ abstract class KafkaAction(
       record <- new ProducerRecord(topic, null, key.getOrElse(""), payload, headers).success
       around <- aroundSend(reqName, session, record, topic)
     } yield {
-      around(producer.send(record))
+      if (!attributes.onlyConsume) around(producer.send(record))
+      else around(None)
     }
   }
 
@@ -56,6 +57,6 @@ abstract class KafkaAction(
         }
     }
 
-  protected def aroundSend(requestName: String, session: Session, producerRecord: ProducerRecord[String, String], topic: String): Validation[Around]
+  protected def aroundSend(requestName: String, session: Session, producerRecord: ProducerRecord[String, Any], topic: String): Validation[Around]
 
 }

@@ -13,14 +13,14 @@ import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 class Send(
             attributes: KafkaAttributes,
             protocol: KafkaProtocol,
-            producer: KafkaProducer[String, String],
+            producer: KafkaProducer[String, Any],
             val statsEngine: StatsEngine,
             val clock: Clock,
             val next: Action,
           ) extends KafkaAction(attributes, protocol, producer, null) {
   override val name: String = genName("kafkaSend")
 
-  override protected def aroundSend(requestName: String, session: Session, producerRecord: ProducerRecord[String, String], topic: String): Validation[Around] = {
+  override protected def aroundSend(requestName: String, session: Session, producerRecord: ProducerRecord[String, Any], topic: String): Validation[Around] = {
     new Around(
       before = () => {
 

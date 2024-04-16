@@ -16,9 +16,9 @@ object KafkaScalaExample {
   )
 
   object CustomMatcher extends KafkaMatcher {
-    override def requestMatchId(msg: ProducerRecord[String, String]): String = ???
+    override def requestMatchId(msg: ProducerRecord[String, _]): String = ???
 
-    override def responseMatchId(msg: ConsumerRecord[String, String]): String = ???
+    override def responseMatchId(msg: ConsumerRecord[String, _]): String = ???
   }
 
   val kafkaProtocol = kafka
@@ -67,5 +67,27 @@ object KafkaScalaExample {
       // Custom check allows you to verify any entity of the record according to your needs.
       record => true
     })
+
+  val kafkaProtobuf = kafka("Kafka: protobuf")
+    .requestReply
+    .topic("#{input_topic}")
+    .payload(
+      AuthLocal("token", 12345, "abc@xyz.com")
+    )
+    .replyTopic("#{output_topic}")
+    .key("WS_PDF.#{user_id}")
+    .protobufOutput(AuthLocal)
+    .check(
+      protobufResponse((auth: AuthLocal) => auth.id) is 12345
+    )
+
+  val onlyConsume = kafka("Kafka: Only consume")
+    .onlyConsume
+    .readTopic("#{output_topic}")
+    .payloadForTracking {
+      "payload"
+    }
+    .keyForTracking("key")
+    .startTime("#{currentTimeMillis()}")
 
 }

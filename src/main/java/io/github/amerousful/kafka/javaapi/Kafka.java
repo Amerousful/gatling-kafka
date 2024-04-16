@@ -23,4 +23,9 @@ public class Kafka {
   public RequestReplyActionBuilder.Topic requestReply() {
     return new RequestReplyActionBuilder.Topic(wrapped.requestReply());
   }
+
+  @NonNull
+  public OnlyConsumeActionBuilder.Topic onlyConsume() {
+    return new OnlyConsumeActionBuilder.Topic(wrapped.onlyConsume());
+  }
 }

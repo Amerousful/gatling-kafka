@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 import static io.gatling.javaapi.core.internal.Converters.toScalaFunction;
 import static io.gatling.javaapi.core.internal.Expressions.*;
-import static io.gatling.javaapi.core.internal.Expressions.toExpression;
+
 
 public final class KafkaDsl {
     private KafkaDsl() {
@@ -65,7 +65,7 @@ public final class KafkaDsl {
     }
 
     @SuppressWarnings("rawtypes")
-    public static CheckBuilder simpleCheck(Function<ConsumerRecord<String, String>, Boolean> f) {
+    public static CheckBuilder simpleCheck(Function<ConsumerRecord<String, ?>, Boolean> f) {
         return new CheckBuilder() {
             @Override
             public io.gatling.core.check.CheckBuilder<?, ?> asScala() {

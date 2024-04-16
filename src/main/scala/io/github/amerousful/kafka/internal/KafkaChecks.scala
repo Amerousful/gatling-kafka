@@ -15,6 +15,7 @@ import io.github.amerousful.kafka.{KafkaCheck, KafkaResponseMessage, Predef => K
 import com.fasterxml.jackson.databind.JsonNode
 import io.gatling.core.check.regex.RegexCheckType
 import io.github.amerousful.kafka.check.header.KafkaHeaderCheckType
+import io.github.amerousful.kafka.check.protobuf.KafkaProtobufCheckType
 import io.github.amerousful.kafka.javaapi.internal.KafkaCheckType
 import net.sf.saxon.s9api.XdmNode
 
@@ -32,6 +33,7 @@ object KafkaChecks {
       case CoreCheckType.XPath => scalaCheck.asInstanceOf[CheckBuilder[XPathCheckType, XdmNode]].build(KafkaPredef.kafkaXPathMaterializer)
       case CoreCheckType.Regex => scalaCheck.asInstanceOf[CheckBuilder[RegexCheckType, String]].build(KafkaPredef.kafkaRegexMaterializer)
       case KafkaCheckType.Header => scalaCheck.asInstanceOf[CheckBuilder[KafkaHeaderCheckType, KafkaResponseMessage]].build(KafkaPredef.kafkaHeaderCheckMaterializer)
+//      case KafkaCheckType.Protobuf => scalaCheck.asInstanceOf[CheckBuilder[KafkaProtobufCheckType, KafkaResponseMessage]].build(KafkaPredef.kafkaProtobufCheckMaterializer)
       case KafkaCheckType.Simple => scalaCheck.build(null).asInstanceOf[KafkaCheck]
       case unknown => throw new IllegalArgumentException(s"Kafka DSL doesn't support $unknown")
     }

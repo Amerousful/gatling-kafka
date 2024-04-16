@@ -6,7 +6,7 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import io.github.amerousful.kafka.client.KafkaTrackerPoll
 
 final case class KafkaComponents(val kafkaProtocol: KafkaProtocol,
-                                 val kafkaProducer: KafkaProducer[String, String],
+                                 val kafkaProducer: KafkaProducer[String, Any],
                                  val kafkaTrackerPoll: KafkaTrackerPoll,
                                 ) extends ProtocolComponents {
   override def onStart: Session => Session = Session.Identity

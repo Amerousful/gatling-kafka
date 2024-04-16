@@ -9,8 +9,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static io.gatling.javaapi.core.internal.Converters.toScalaMap;
-import static io.gatling.javaapi.core.internal.Expressions.javaFunctionToExpression;
-import static io.gatling.javaapi.core.internal.Expressions.toStringExpression;
+import static io.gatling.javaapi.core.internal.Expressions.*;
 
 
 public final class KafkaSendActionBuilder implements ActionBuilder {
@@ -56,11 +55,11 @@ public final class KafkaSendActionBuilder implements ActionBuilder {
 
     @NonNull
     public KafkaSendActionBuilder payload(@NonNull String payload) {
-      return new KafkaSendActionBuilder(wrapped.payload(toStringExpression(payload)));
+      return new KafkaSendActionBuilder(wrapped.payload(toAnyExpression(payload)));
     }
 
     @NonNull
-    public KafkaSendActionBuilder payload(@NonNull Function<Session, String> payload) {
+    public KafkaSendActionBuilder payload(@NonNull Function<Session, Object> payload) {
       return new KafkaSendActionBuilder(wrapped.payload(javaFunctionToExpression(payload)));
     }
 
