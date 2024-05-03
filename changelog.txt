@@ -1,3 +1,7 @@
+Changelog 3.1 (03-05-2024)
+----------------------------
+* Akka dependencies ^2.7.0
+
 Changelog 3.0 (16-04-2024)
 ----------------------------
 * Protobuf support
