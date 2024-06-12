@@ -56,6 +56,13 @@ final case class KafkaProtocolBuilder(kafkaProtocol: KafkaProtocol) {
         s"""org.apache.kafka.common.security.$jaasConfigModule required username="$username" password="$password";""".stripMargin)
   }
 
+  def ssl(protocol: String, keystoreLocation: String, keystorePassword: String, keyPassword: String): KafkaProtocolBuilder = {
+    addConsumerAndProducerProperty("security.protocol", protocol)
+      .addConsumerAndProducerProperty("ssl.keystore.location", keystoreLocation)
+      .addConsumerAndProducerProperty("ssl.keystore.password", keystorePassword)
+      .addConsumerAndProducerProperty("ssl.key.password", keyPassword)
+  }
+
   def addProducerProperty(key: String, value: String): KafkaProtocolBuilder = {
     this.modify(_.kafkaProtocol.producerProperties)(_ + (key -> value))
   }
