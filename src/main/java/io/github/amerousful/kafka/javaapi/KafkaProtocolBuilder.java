@@ -86,6 +86,11 @@ public final class KafkaProtocolBuilder implements ProtocolBuilder {
     }
 
     @NonNull
+    public KafkaProtocolBuilder ssl(@NonNull String protocol, @NonNull String keystoreLocation, @NonNull String keystorePassword, @NonNull String keyPassword) {
+        return new KafkaProtocolBuilder(wrapped.ssl(protocol, keystoreLocation, keystorePassword, keyPassword));
+    }
+
+    @NonNull
     public KafkaProtocolBuilder replyTimeout(long timeout) {
         return replyTimeout(Duration.ofSeconds(timeout));
     }
