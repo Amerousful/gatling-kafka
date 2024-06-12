@@ -11,7 +11,7 @@ Add to your `pom.xml`
 <dependency>
     <groupId>io.github.amerousful</groupId>
     <artifactId>gatling-kafka</artifactId>
-    <version>3.1</version>
+    <version>3.2</version>
 </dependency>
 ```
 
@@ -20,7 +20,7 @@ Add to your `pom.xml`
 Add to your `build.sbt`
 
 ```scala
-libraryDependencies += "io.github.amerousful" % "gatling-kafka" % "3.1"
+libraryDependencies += "io.github.amerousful" % "gatling-kafka" % "3.2"
 ```
 
 Import:

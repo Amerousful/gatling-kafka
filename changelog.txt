@@ -1,3 +1,7 @@
+Changelog 3.2 (12-06-2024)
+----------------------------
+* Added support for SSL using keystore
+
 Changelog 3.1 (03-05-2024)
 ----------------------------
 * Akka dependencies ^2.7.0

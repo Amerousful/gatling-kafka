@@ -30,6 +30,12 @@ object KafkaScalaExample {
       sslEnabled = true,
       saslMechanism = scram_sha_512
     )
+    .ssl(
+      protocol = "SASL_SSL",
+      keystoreLocation = "/var/private/ssl/kafka.keystore.jks",
+      keystorePassword = "connector1234",
+      keyPassword = "connector1234"
+    )
     .acks("1")
     .producerIdenticalSerializer("org.apache.kafka.common.serialization.StringSerializer")
     .consumerIdenticalDeserializer("org.apache.kafka.common.serialization.StringDeserializer")

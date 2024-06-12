@@ -1,6 +1,6 @@
 name := "gatling-kafka"
 
-version := "3.1"
+version := "3.2"
 
 scalaVersion := "2.13.12"
 
