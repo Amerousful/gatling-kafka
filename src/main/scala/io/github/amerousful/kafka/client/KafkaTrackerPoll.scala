@@ -51,10 +51,10 @@ class KafkaTrackerPoll(
     case TrackerAndController(_, consumerControl) => consumerControl.shutdown()
   }
 
-  private val consumerPropertiesTrackerPool: Map[String, AnyRef] = (consumerProperties ++ Map(
+  private val consumerPropertiesTrackerPool: Map[String, AnyRef] = (Map(
     "enable.auto.commit" -> "true",
     "auto.offset.reset" -> "latest"
-  )).updatedWith("group.id")({
+  ) ++ consumerProperties).updatedWith("group.id")({
     case None => Some(s"gatling-test-${java.util.UUID.randomUUID()}")
     case Some(value) => Some(value)
   })

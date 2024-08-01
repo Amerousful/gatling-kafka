@@ -1,3 +1,7 @@
+Changelog 3.3 (01-08-2024)
+----------------------------
+* Add the ability to override the `auto.offset.reset` and `enable.auto.commit` values in the TrackerPoll
+
 Changelog 3.2 (12-06-2024)
 ----------------------------
 * Added support for SSL using keystore

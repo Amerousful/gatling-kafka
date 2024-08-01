@@ -1,6 +1,7 @@
 package io.github.amerousful.kafka.protocol
 
 import com.softwaremill.quicklens.ModifyPimp
+import io.github.amerousful.kafka.protocol.AutoOffsetReset.AutoOffsetReset
 import org.apache.kafka.clients.producer.ProducerConfig._
 import org.apache.kafka.clients.consumer.ConsumerConfig._
 import io.github.amerousful.kafka.protocol.SaslMechanism.SaslMechanism
@@ -87,6 +88,10 @@ final case class KafkaProtocolBuilder(kafkaProtocol: KafkaProtocol) {
   def replyConsumerName(name: String): KafkaProtocolBuilder = addConsumerProperty(GROUP_ID_CONFIG, name)
 
   def schemaUrl(url: String): KafkaProtocolBuilder = addConsumerAndProducerProperty("schema.registry.url", url)
+
+  def disableAutoCommit() =  addConsumerProperty(ENABLE_AUTO_COMMIT_CONFIG, "false")
+
+  def autoOffsetResetPolicy(value: AutoOffsetReset) = addConsumerProperty(AUTO_OFFSET_RESET_CONFIG, value)
 
   def build: KafkaProtocol = kafkaProtocol
 }
