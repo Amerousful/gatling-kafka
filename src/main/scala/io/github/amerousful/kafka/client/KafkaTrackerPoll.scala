@@ -12,7 +12,6 @@ import io.gatling.core.util.NameGen
 import io.github.amerousful.kafka.action.KafkaLogging
 import io.github.amerousful.kafka.protocol.KafkaMatcher
 import io.github.amerousful.kafka.request.KafkaAttributes
-import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
 
 import java.util.concurrent.{ConcurrentHashMap, CountDownLatch}

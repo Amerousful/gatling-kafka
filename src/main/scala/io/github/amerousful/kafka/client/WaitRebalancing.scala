@@ -12,7 +12,6 @@ case class WaitRebalancing(consumerName: String, callback: () => Unit) extends P
 
   override def onAssign(assignedTps: Set[TopicPartition], consumer: RestrictedConsumer): Unit = {
     logger.debug(s"Partitions [${assignedTps.mkString(", ")}] have been assigned for consumer [$consumerName]")
-    consumer.seekToEnd(assignedTps.asJava)
     callback()
   }
 
