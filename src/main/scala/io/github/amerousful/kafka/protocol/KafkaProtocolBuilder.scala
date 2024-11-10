@@ -2,9 +2,9 @@ package io.github.amerousful.kafka.protocol
 
 import com.softwaremill.quicklens.ModifyPimp
 import io.github.amerousful.kafka.protocol.AutoOffsetReset.AutoOffsetReset
-import org.apache.kafka.clients.producer.ProducerConfig._
-import org.apache.kafka.clients.consumer.ConsumerConfig._
 import io.github.amerousful.kafka.protocol.SaslMechanism.SaslMechanism
+import org.apache.kafka.clients.consumer.ConsumerConfig._
+import org.apache.kafka.clients.producer.ProducerConfig._
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -64,6 +64,19 @@ final case class KafkaProtocolBuilder(kafkaProtocol: KafkaProtocol) {
       .addConsumerAndProducerProperty("ssl.key.password", keyPassword)
   }
 
+  def ssl(
+           protocol: String,
+           keystoreLocation: String,
+           keystorePassword: String,
+           keyPassword: String,
+           trustStoreLocation: String,
+           trustStorePassword: String
+         ): KafkaProtocolBuilder = {
+    ssl(protocol, keystoreLocation, keystorePassword, keyPassword)
+      .addConsumerAndProducerProperty("ssl.truststore.location", trustStoreLocation)
+      .addConsumerAndProducerProperty("ssl.truststore.password", trustStorePassword)
+  }
+
   def addProducerProperty(key: String, value: String): KafkaProtocolBuilder = {
     this.modify(_.kafkaProtocol.producerProperties)(_ + (key -> value))
   }
@@ -89,7 +102,7 @@ final case class KafkaProtocolBuilder(kafkaProtocol: KafkaProtocol) {
 
   def schemaUrl(url: String): KafkaProtocolBuilder = addConsumerAndProducerProperty("schema.registry.url", url)
 
-  def disableAutoCommit() =  addConsumerProperty(ENABLE_AUTO_COMMIT_CONFIG, "false")
+  def disableAutoCommit() = addConsumerProperty(ENABLE_AUTO_COMMIT_CONFIG, "false")
 
   def autoOffsetResetPolicy(value: AutoOffsetReset) = addConsumerProperty(AUTO_OFFSET_RESET_CONFIG, value)
 

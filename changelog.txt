@@ -1,3 +1,8 @@
+Changelog 3.5 (10-11-2024)
+----------------------------
+* Added support for SSL using truststore
+* Fix single initialization of properties for Kafka consumer
+
 Changelog 3.4 (02-08-2024)
 ----------------------------
 * Fix. Remove `seekToEnd` after rebalancing

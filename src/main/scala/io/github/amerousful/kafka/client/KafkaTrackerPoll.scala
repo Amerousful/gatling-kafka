@@ -50,7 +50,7 @@ class KafkaTrackerPoll(
     case TrackerAndController(_, consumerControl) => consumerControl.shutdown()
   }
 
-  private val consumerPropertiesTrackerPool: Map[String, AnyRef] = (Map(
+  private def consumerPropertiesTrackerPool: Map[String, AnyRef] = (Map(
     "enable.auto.commit" -> "true",
     "auto.offset.reset" -> "latest"
   ) ++ consumerProperties).updatedWith("group.id")({
