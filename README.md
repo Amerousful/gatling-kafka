@@ -1,4 +1,4 @@
-# Gatling Kafka Plugin [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.amerousful/gatling-kafka/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.amerousful/gatling-kafka/)
+# Gatling Kafka Plugin [![Sonatype Central](https://maven-badges.sml.io/sonatype-central/io.github.amerousful/gatling-kafka/badge.svg?style=flat)](https://central.sonatype.com/artifact/io.github.amerousful/gatling-kafka/)
 
 ## Install
 
