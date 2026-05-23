@@ -1,7 +1,7 @@
-import io.github.amerousful.kafka.Predef._
 import io.gatling.core.Predef._
-import io.github.amerousful.kafka.protocol.{KafkaBroker, KafkaMatcher}
+import io.github.amerousful.kafka.Predef._
 import io.github.amerousful.kafka.protocol.SaslMechanism.scram_sha_512
+import io.github.amerousful.kafka.protocol.{KafkaBroker, KafkaMatcher}
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.ProducerRecord
 
@@ -82,6 +82,7 @@ object KafkaScalaExample {
     )
     .replyTopic("#{output_topic}")
     .key("WS_PDF.#{user_id}")
+    .groupName("group_name")
     .protobufOutput(AuthLocal)
     .check(
       protobufResponse((auth: AuthLocal) => auth.id) is 12345
@@ -94,6 +95,7 @@ object KafkaScalaExample {
       "payload"
     }
     .keyForTracking("key")
+    .groupName("group_name")
     .startTime("#{currentTimeMillis()}")
 
 }
