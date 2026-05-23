@@ -25,7 +25,7 @@ class Send(
       before = () => {
 
         if (logger.underlying.isDebugEnabled) {
-          logger.debug(s"Sent Kafka message. Topic: $topic Key: ${producerRecord.key()} Payload: ${producerRecord.value()}")
+          logger.debug(s"Sent Kafka message:\n$session\nTopic: $topic Key: ${producerRecord.key()} Payload: ${producerRecord.value()}")
         }
 
         val now = clock.nowMillis

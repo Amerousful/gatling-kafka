@@ -14,6 +14,7 @@ import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 class RequestReply(
                     attributes: KafkaAttributes,
                     replyTopic: Expression[String],
+                    customGroup: Option[Expression[String]],
                     protocol: KafkaProtocol,
                     producer: KafkaProducer[String, Any],
                     kafkaTrackerPoll: KafkaTrackerPoll,
@@ -31,14 +32,16 @@ class RequestReply(
       resolvedReadTopic <- replyTopic(session)
     } yield {
 
+      val resolvedCustomName: Option[String] = customGroup
+        .flatMap(expression => expression(session).toOption)
 
       val matchId: Any = messageMatcher.requestMatchId(producerRecord)
-      val tracker = kafkaTrackerPoll.tracker(resolvedReadTopic, messageMatcher, attributes)
+      val tracker = kafkaTrackerPoll.tracker(resolvedReadTopic, messageMatcher, attributes, resolvedCustomName)
 
       new Around(
         before = () => {
           if (logger.underlying.isDebugEnabled) {
-            logger.debug(s"Sent Kafka message. Topic: $topic Key: ${producerRecord.key()} Payload: ${producerRecord.value()}")
+            logger.debug(s"Sent Kafka message:\n$session\nTopic: $topic Key: ${producerRecord.key()} Payload: ${producerRecord.value()}")
           }
 
           if (matchId != null) {

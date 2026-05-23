@@ -9,6 +9,7 @@ import io.github.amerousful.kafka.request.KafkaAttributes
 final class OnlyConsumeBuilder(
                            attributes: KafkaAttributes,
                            replyTopic: Expression[String],
+                           customGroup: Option[Expression[String]],
                          ) extends KafkaActionBuilder {
 
   override def build(ctx: ScenarioContext, next: Action): Action = {
@@ -18,6 +19,7 @@ final class OnlyConsumeBuilder(
     new OnlyConsume(
       attributes,
       replyTopic,
+      customGroup,
       kafkaComponents.kafkaProtocol,
       kafkaComponents.kafkaProducer,
       kafkaComponents.kafkaTrackerPoll,

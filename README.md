@@ -7,11 +7,10 @@
 Add to your `pom.xml`
 
 ```xml
-
 <dependency>
     <groupId>io.github.amerousful</groupId>
     <artifactId>gatling-kafka</artifactId>
-    <version>3.5</version>
+    <version>3.6</version>
 </dependency>
 ```
 
@@ -20,7 +19,7 @@ Add to your `pom.xml`
 Add to your `build.sbt`
 
 ```scala
-libraryDependencies += "io.github.amerousful" % "gatling-kafka" % "3.5"
+libraryDependencies += "io.github.amerousful" % "gatling-kafka" % "3.6"
 ```
 
 Import:
@@ -114,7 +113,7 @@ kafka("Kafka: request with reply")
   .replyTopic("output_topic")
 ```
 
-3) Only consume. 
+3) Only consume.
 ```scala
  kafka("Kafka: Only consume")
     .onlyConsume
@@ -135,7 +134,7 @@ Another aspect to consider is the potential usefulness of tracking when a messag
 -- Consume a message from Kafka
 ```
 
-If startTime is not passed, it defaults to the current time. 
+If startTime is not passed, it defaults to the current time.
 
 ***
 In a case with request-reply you have to define in a **protocol** waiting time for the reply:
@@ -151,7 +150,6 @@ Another thing that you have to provide it's how to match a message. There are se
 3) Custom matcher:
 
 ```scala
-
 object CustomMatcher extends KafkaMatcher {
   override def requestMatchId(msg: ProducerRecord[String, String]): String = ???
 
@@ -161,7 +159,6 @@ object CustomMatcher extends KafkaMatcher {
 ...
 
 .messageMatcher(CustomMatcher)
-
 ```
 
 ### Chain for build a request:
@@ -175,27 +172,37 @@ requestReply ->
             topic() -> 
                 payload() -> 
                         replyTopic() -> 
-                            key() / headers() / check() / protobufOutput()
+                            key() / headers() / check() / protobufOutput() / groupName()
                             
 onlyConsume -> 
             readTopic() -> 
                 payloadForTracking() -> 
-                            keyForTracking() / headerForTracking() / check() / startTime() / protobufOutput()
+                            keyForTracking() / headerForTracking() / check() / startTime() / protobufOutput() / groupName()
 ```
 
 ### Reply consumer name:
-1) Static name: `.replyConsumerName("gatling-test-consumer")` 
+1) Static name: `.replyConsumerName("gatling-test-consumer")`
 2) If you don't define a static name it will generate by pattern `gatling-test-${java.util.UUID.randomUUID()}`
 
+### Custom Consumer Group Name:
+You can explicitly set or override the consumer group name at the request level using the `.groupName()` modifier:
+```scala
+kafka("Kafka: Custom Group")
+  .requestReply
+  .topic("input_topic")
+  ...
+  .groupName("#{customGroup}")
+```
+
 ### Logs:
-Add to your `logback.xml`: 
+Add to your `logback.xml`:
 ```xml
 <logger name="io.github.amerousful.kafka" level="ALL"/>
 ```
 ***
 ## Protobuf
-Starting from version 3.0, support for Protobuf payloads has been introduced. 
-Please note that all examples provided assume the usage of Scala with Maven as the setup. 
+Starting from version 3.0, support for Protobuf payloads has been introduced.
+Please note that all examples provided assume the usage of Scala with Maven as the setup.
 This functionality works with classes generated through [ScalaPB](https://scalapb.github.io/).
 
 Instruction:
@@ -226,7 +233,7 @@ message Order {
 ```
 
 2) Add to the `pom.xml` Protobuf class generator.\
-**Important**!  You have to define output for both Java and Scala.
+   **Important**!  You have to define output for both Java and Scala.
 ```xml
 ...
 <build>
@@ -302,7 +309,6 @@ message Order {
 ```
 8) Protocol.
 ```scala
-
 .consumerKeyDeserializer("org.apache.kafka.common.serialization.StringDeserializer")
   
 .producerKeySerializer("org.apache.kafka.common.serialization.StringSerializer")

@@ -14,6 +14,7 @@ import io.github.amerousful.kafka.request.KafkaAttributes
 class OnlyConsume(
                    attributes: KafkaAttributes,
                    readTopic: Expression[String],
+                   customGroup: Option[Expression[String]],
                    protocol: KafkaProtocol,
                    producer: KafkaProducer[String, Any],
                    kafkaTrackerPoll: KafkaTrackerPoll,
@@ -32,8 +33,11 @@ class OnlyConsume(
       startTime <- attributes.startTime(session)
     } yield {
 
+      val resolvedCustomName: Option[String] = customGroup
+        .flatMap(expression => expression(session).toOption)
+
       val matchId: Any = messageMatcher.requestMatchId(producerRecord)
-      val tracker = kafkaTrackerPoll.tracker(resolvedReadTopic, messageMatcher, attributes)
+      val tracker = kafkaTrackerPoll.tracker(resolvedReadTopic, messageMatcher, attributes, resolvedCustomName)
 
       new Around(
         before = () => {
