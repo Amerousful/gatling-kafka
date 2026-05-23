@@ -2,7 +2,7 @@ name := "gatling-kafka"
 
 version := "3.6"
 
-scalaVersion := "2.13.12"
+scalaVersion := "2.13.15"
 
 val gatlingVersion = "3.9.5"
 
