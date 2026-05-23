@@ -1,4 +1,3 @@
-
 import edu.umd.cs.findbugs.annotations.NonNull;
 import io.gatling.javaapi.core.ScenarioBuilder;
 import io.github.amerousful.kafka.javaapi.KafkaMessageMatcher;
@@ -9,7 +8,8 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.util.Collections;
 
-import static io.gatling.javaapi.core.CoreDsl.*;
+import static io.gatling.javaapi.core.CoreDsl.jsonPath;
+import static io.gatling.javaapi.core.CoreDsl.scenario;
 import static io.github.amerousful.kafka.javaapi.KafkaDsl.*;
 
 public class KafkaJavaExample {
@@ -70,6 +70,7 @@ public class KafkaJavaExample {
                                     .payload("message")
                                     .replyTopic("output_topic")
                                     .key("#{key}")
+                                    .groupName("group_name")
                                     .check(jsonPath("$.m").is("#{payload}_1"))
                                     .checkIf("#{bool}")
                                     .then(jsonPath("$..foo"))
@@ -84,6 +85,7 @@ public class KafkaJavaExample {
                                     .readTopic("")
                                     .payloadForTracking("")
                                     .keyForTracking("")
+                                    .groupName("group_name")
                                     .startTime(session -> 100000000L)
                     );
 

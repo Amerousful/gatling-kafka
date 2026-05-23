@@ -1,7 +1,10 @@
-import io.gatling.javaapi.core.*
-import io.gatling.javaapi.core.CoreDsl.*
-import io.github.amerousful.kafka.javaapi.*
-import io.github.amerousful.kafka.javaapi.KafkaDsl.*
+import io.gatling.javaapi.core.CoreDsl
+import io.gatling.javaapi.core.CoreDsl.scenario
+import io.gatling.javaapi.core.ScenarioBuilder
+import io.gatling.javaapi.core.Session
+import io.github.amerousful.kafka.javaapi.KafkaDsl
+import io.github.amerousful.kafka.javaapi.KafkaDsl.KafkaBroker
+import io.github.amerousful.kafka.javaapi.KafkaDsl.kafka
 import io.github.amerousful.kafka.javaapi.KafkaMessageMatcher
 import io.github.amerousful.kafka.protocol.SaslMechanism
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -22,22 +25,22 @@ class KafkaKotlinExample {
     }
 
     val kafkaProtocol = kafka
-            .broker(KafkaBroker("kafka.us-east-1.amazonaws.com", 9096))
-            .brokers(
-                    KafkaBroker("kafka.us-east-2.amazonaws.com", 9096),
-                    KafkaBroker("kafka.us-east-3.amazonaws.com", 9096)
-            )
-            .acks("1")
-            .producerIdenticalSerializer("org.apache.kafka.common.serialization.StringSerializer")
-            .consumerIdenticalDeserializer("org.apache.kafka.common.serialization.StringDeserializer")
-            .addProducerProperty("retries", "3")
-            .addConsumerProperty("heartbeat.interval.ms", "3000")
-            .credentials("admin", "password", true, SaslMechanism.plain())
-            .replyTimeout(10)
-            .matchByKey()
-            .matchByValue()
-            .messageMatcher(customMatcher)
-            .replyConsumerName("gatling-test-consumer")
+        .broker(KafkaBroker("kafka.us-east-1.amazonaws.com", 9096))
+        .brokers(
+            KafkaBroker("kafka.us-east-2.amazonaws.com", 9096),
+            KafkaBroker("kafka.us-east-3.amazonaws.com", 9096)
+        )
+        .acks("1")
+        .producerIdenticalSerializer("org.apache.kafka.common.serialization.StringSerializer")
+        .consumerIdenticalDeserializer("org.apache.kafka.common.serialization.StringDeserializer")
+        .addProducerProperty("retries", "3")
+        .addConsumerProperty("heartbeat.interval.ms", "3000")
+        .credentials("admin", "password", true, SaslMechanism.plain())
+        .replyTimeout(10)
+        .matchByKey()
+        .matchByValue()
+        .messageMatcher(customMatcher)
+        .replyConsumerName("gatling-test-consumer")
 
     //#simple
     fun checkRecordValue(record: ConsumerRecord<String?, *>): Boolean {
@@ -45,28 +48,29 @@ class KafkaKotlinExample {
     }
 
     val scn: ScenarioBuilder = scenario("scenario")
-            .exec(
-                    kafka("Kafka: fire and forget")
-                            .send()
-                            .topic("input_topic")
-                            .payload("#{payload}")
-                            .key("#{key}")
-                            .header("k1", "v1")
-                            .headers(Collections.singletonMap("key", "value"))
-            )
-            .exec(
-                    kafka("Kafka: request with reply")
-                            .requestReply()
-                            .topic("input_topic")
-                            .payload("message")
-                            .replyTopic("output_topic")
-                            .key("#{key}")
-                            .check(CoreDsl.jsonPath("$.m").`is`("#{payload}_1"))
-                            .checkIf("#{bool}")
-                            .then(CoreDsl.jsonPath("$..foo"))
-                            .checkIf { message: ConsumerRecord<String?, *>?, session: Session? -> true }
-                            .then(CoreDsl.jsonPath("$").`is`("hello"))
-                            .check(KafkaDsl.header("header1").`in`("value1"))
-                            .check(KafkaDsl.simpleCheck { record: ConsumerRecord<String?, *> -> this.checkRecordValue(record) })
-            )
+        .exec(
+            kafka("Kafka: fire and forget")
+                .send()
+                .topic("input_topic")
+                .payload("#{payload}")
+                .key("#{key}")
+                .header("k1", "v1")
+                .headers(Collections.singletonMap("key", "value"))
+        )
+        .exec(
+            kafka("Kafka: request with reply")
+                .requestReply()
+                .topic("input_topic")
+                .payload("message")
+                .replyTopic("output_topic")
+                .key("#{key}")
+                .groupName("group_name")
+                .check(CoreDsl.jsonPath("$.m").`is`("#{payload}_1"))
+                .checkIf("#{bool}")
+                .then(CoreDsl.jsonPath("$..foo"))
+                .checkIf { message: ConsumerRecord<String?, *>?, session: Session? -> true }
+                .then(CoreDsl.jsonPath("$").`is`("hello"))
+                .check(KafkaDsl.header("header1").`in`("value1"))
+                .check(KafkaDsl.simpleCheck { record: ConsumerRecord<String?, *> -> this.checkRecordValue(record) })
+        )
 }
