@@ -29,7 +29,6 @@ object SendDslBuilder {
       KafkaAttributes(requestName, topicName, payload),
       new SendBuilder(_))
   }
-
 }
 
 final case class SendDslBuilder(attributes: KafkaAttributes, factory: KafkaAttributes => ActionBuilder) {
@@ -45,7 +44,6 @@ final case class SendDslBuilder(attributes: KafkaAttributes, factory: KafkaAttri
   def build: ActionBuilder = factory(attributes)
 }
 
-
 object RequestReplyDslBuilder {
   final case class Topic(requestName: Expression[String]) {
     def topic(topicName: Expression[String]): Payload = Payload(requestName, topicName)
@@ -57,12 +55,14 @@ object RequestReplyDslBuilder {
 
   final case class ReplyTopic(requestName: Expression[String], topicName: Expression[String], payload: Expression[Any]) {
     def replyTopic(replyTopic: Expression[String]): RequestReplyDslBuilder =
-      RequestReplyDslBuilder(KafkaAttributes(requestName, topicName, payload = payload),
-        new RequestReplyBuilder(_, replyTopic))
+      RequestReplyDslBuilder(KafkaAttributes(requestName, topicName, payload = payload), replyTopic)
   }
 }
 
-final case class RequestReplyDslBuilder(attributes: KafkaAttributes, factory: KafkaAttributes => ActionBuilder) {
+final case class RequestReplyDslBuilder(protected val attributes: KafkaAttributes, protected val replyTopic: Expression[String], protected val customGroup: Option[Expression[String]] = None) {
+
+  def groupName(group: Expression[String]) =
+    this.modify(_.customGroup).setTo(Some(group))
 
   def key(key: Expression[String]) = this.modify(_.attributes.key).setTo(Some(key))
 
@@ -87,7 +87,7 @@ final case class RequestReplyDslBuilder(attributes: KafkaAttributes, factory: Ka
   def checkIf(condition: (KafkaResponseMessage, Session) => Validation[Boolean])(thenChecks: KafkaCheck*): RequestReplyDslBuilder =
     check(thenChecks.map(_.checkIf(condition)): _*)
 
-  def build: ActionBuilder = factory(attributes)
+  def build: ActionBuilder = new RequestReplyBuilder(attributes, replyTopic, customGroup)
 }
 
 object OnlyConsumeDslBuilder {
@@ -97,13 +97,20 @@ object OnlyConsumeDslBuilder {
 
   final case class TrackPayload(requestName: Expression[String], readTopic: Expression[String]) {
     def payloadForTracking(payload: Expression[Any]): OnlyConsumeDslBuilder =
-      OnlyConsumeDslBuilder(KafkaAttributes(requestName, readTopic, payload), new OnlyConsumeBuilder(_, readTopic)).onlyConsume
+      OnlyConsumeDslBuilder(KafkaAttributes(requestName, readTopic, payload), readTopic).onlyConsume
   }
 }
 
-final case class OnlyConsumeDslBuilder(attributes: KafkaAttributes, factory: KafkaAttributes => ActionBuilder) {
+final case class OnlyConsumeDslBuilder(
+                                        attributes: KafkaAttributes,
+                                        protected val readTopic: Expression[String],
+                                        protected val customGroup: Option[Expression[String]] = None
+                                      ) {
 
   def onlyConsume = this.modify(_.attributes.onlyConsume).setTo(true)
+
+  def groupName(group: Expression[String]) =
+    this.modify(_.customGroup).setTo(Some(group))
 
   def keyForTracking(key: Expression[String]) = this.modify(_.attributes.key).setTo(Some(key))
 
@@ -130,6 +137,5 @@ final case class OnlyConsumeDslBuilder(attributes: KafkaAttributes, factory: Kaf
   def checkIf(condition: (KafkaResponseMessage, Session) => Validation[Boolean])(thenChecks: KafkaCheck*): OnlyConsumeDslBuilder =
     check(thenChecks.map(_.checkIf(condition)): _*)
 
-  def build: ActionBuilder = factory(attributes)
+  def build: ActionBuilder = new OnlyConsumeBuilder(attributes, readTopic, customGroup)
 }
-

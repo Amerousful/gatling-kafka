@@ -29,8 +29,6 @@ class KafkaTrackerPoll(
 
   private val trackers = new ConcurrentHashMap[String, TrackerAndController]
 
-  private val rebalancingLatch: CountDownLatch = new CountDownLatch(1)
-
   // Disable logs for Actor
   private val disableLogsConfig: Config = {
     val configString =
@@ -50,24 +48,27 @@ class KafkaTrackerPoll(
     case TrackerAndController(_, consumerControl) => consumerControl.shutdown()
   }
 
-  private def consumerPropertiesTrackerPool: Map[String, AnyRef] = (Map(
-    "enable.auto.commit" -> "true",
-    "auto.offset.reset" -> "latest"
-  ) ++ consumerProperties).updatedWith("group.id")({
-    case None => Some(s"gatling-test-${java.util.UUID.randomUUID()}")
-    case Some(value) => Some(value)
-  })
+  private def consumerPropertiesTrackerPool(customGroup: Option[String] = None): Map[String, AnyRef] = (
+    Map(
+      "enable.auto.commit" -> "true",
+      "auto.offset.reset" -> "latest"
+    ) ++ consumerProperties)
+    .updatedWith("group.id") { existingGroupId =>
+      customGroup
+        .orElse(existingGroupId)
+        .orElse(Some(s"gatling-test-${java.util.UUID.randomUUID()}"))
+    }
 
   private val transformMapValueToString: ((String, AnyRef)) => (String, String) = {
     case (key, value: String) => key -> value
     case (key, value) => key -> value.toString
   }
 
-  private def createConsumer(readTopic: String, attributes: KafkaAttributes) = {
-    val properties = consumerPropertiesTrackerPool.map(transformMapValueToString)
+  private def createConsumer(readTopic: String, latch: CountDownLatch, attributes: KafkaAttributes, customGroup: Option[String] = None) = {
+    val properties = consumerPropertiesTrackerPool(customGroup).map(transformMapValueToString)
 
     val consumerName: String = properties("group.id")
-    logger.debug(s"Create consumer - $consumerName")
+    logger.debug(s"Create a consumer - $consumerName")
 
     val kafkaConfig = systemAkkaConsumer.settings.config.getConfig("akka.kafka.consumer")
 
@@ -93,23 +94,38 @@ class KafkaTrackerPoll(
 
     val subscription = Subscriptions
       .topics(readTopic)
-      .withPartitionAssignmentHandler(WaitRebalancing(consumerName, () => rebalancingLatch.countDown()))
+      .withPartitionAssignmentHandler(WaitRebalancing(consumerName, () => latch.countDown()))
 
     Consumer.plainSource(consumerSettings, subscription)
   }
 
-  def tracker(readTopic: String, messageMatcher: KafkaMatcher, attributes: KafkaAttributes): KafkaTracker = {
+  def tracker(readTopic: String, messageMatcher: KafkaMatcher, attributes: KafkaAttributes, customGroup: Option[String] = None): KafkaTracker = {
+
+    val trackerStoreName = customGroup match {
+      case Some(value) =>
+        logger.debug(s"Using custom group name [$value] for tracker store")
+        value
+      case None =>
+        logger.debug(s"No custom group provided; using topic name [$readTopic] for tracker store")
+        readTopic
+    }
+
+    logger.debug(s"Getting a tracker by name [$trackerStoreName]")
+
     trackers.computeIfAbsent(
-      readTopic,
+      trackerStoreName,
       _ => {
+        logger.debug(s"Creating a tracker by name [$trackerStoreName]")
+        val localLatch = new CountDownLatch(1)
+
         val actor = system.actorOf(Tracker.props(statsEngine, clock), genName("kafkaTrackerActor"))
-        val consumer = createConsumer(readTopic, attributes)
+        val consumer = createConsumer(readTopic, localLatch, attributes, customGroup)
 
         val (consumerControl, streamComplete) =
           consumer
             .toMat(Sink.foreach { record =>
               val matchId = messageMatcher.responseMatchId(record)
-              logger.debug(s"Received Kafka message. Key: ${record.key()} Payload: ${record.value()}. With matchId - $matchId")
+              logger.debug(s"[$trackerStoreName] Received Kafka message. Key: ${record.key()} Payload: ${record.value()}. With matchId - $matchId")
               actor ! MessageReceived(matchId, clock.nowMillis, record)
             })(Keep.both)
             .run()
@@ -121,7 +137,7 @@ class KafkaTrackerPoll(
 
         // We cannot yield tracker until partitions aren't rebalanced for consumer.
         // Rebalancing takes a while.
-        rebalancingLatch.await()
+        localLatch.await()
 
         TrackerAndController(new KafkaTracker(actor), consumerControl)
       }
